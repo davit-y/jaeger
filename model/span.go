@@ -19,8 +19,9 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-	"time"
+	"strings"
 
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/opentracing/opentracing-go/ext"
 )
 
@@ -31,32 +32,35 @@ const (
 	debugFlag = Flags(2)
 )
 
-// TraceID is a random 128bit identifier for a trace
-type TraceID struct {
-	Low  uint64 `json:"lo"`
-	High uint64 `json:"hi"`
-}
+// // TraceID is a random 128bit identifier for a trace
+// type TraceID struct {
+// 	Low  uint64 `json:"lo"`
+// 	High uint64 `json:"hi"`
+// }
 
 // Flags is a bit map of flags for a span
 type Flags uint32
 
-// SpanID is a random 64bit identifier for a span
+// SpanID is a random 64bit identifier for a span.
+// It is used as a custom type in gogo proto.
+// https://github.com/gogo/protobuf/blob/master/custom_types.md#custom-type-method-signatures
 type SpanID uint64
 
 // Span represents a unit of work in an application, such as an RPC, a database call, etc.
-type Span struct {
-	TraceID       TraceID       `json:"traceID"`
-	SpanID        SpanID        `json:"spanID"`
-	OperationName string        `json:"operationName"`
-	References    []SpanRef     `json:"references,omitempty"`
-	Flags         Flags         `json:"flags,omitempty"`
-	StartTime     time.Time     `json:"startTime"`
-	Duration      time.Duration `json:"duration"`
-	Tags          []KeyValue    `json:"tags,omitempty"`
-	Logs          []Log         `json:"logs,omitempty"`
-	Process       *Process      `json:"process"`
-	Warnings      []string      `json:"warnings,omitempty"`
-}
+// type Span struct {
+// 	TraceID       TraceID       `json:"traceID"`
+// 	SpanID        SpanID        `json:"spanID"`
+// 	ParentSpanID  SpanID        `json:"parentSpanID"`
+// 	OperationName string        `json:"operationName"`
+// 	References    []SpanRef     `json:"references,omitempty"`
+// 	Flags         Flags         `json:"flags,omitempty"`
+// 	StartTime     time.Time     `json:"startTime"`
+// 	Duration      time.Duration `json:"duration"`
+// 	Tags          []KeyValue    `json:"tags,omitempty"`
+// 	Logs          []Log         `json:"logs,omitempty"`
+// 	Process       *Process      `json:"process"`
+// 	Warnings      []string      `json:"warnings,omitempty"`
+// }
 
 // Hash implements Hash from Hashable.
 func (s *Span) Hash(w io.Writer) (err error) {
@@ -152,6 +156,7 @@ func (f Flags) checkFlags(bit Flags) bool {
 
 // ------- TraceID -------
 
+// String renders trace id as a single hex string.
 func (t TraceID) String() string {
 	if t.High == 0 {
 		return fmt.Sprintf("%x", t.Low)
@@ -181,14 +186,26 @@ func TraceIDFromString(s string) (TraceID, error) {
 	return TraceID{High: hi, Low: lo}, nil
 }
 
-// MarshalText allows TraceID to serialize itself in JSON as a string.
-func (t TraceID) MarshalText() ([]byte, error) {
-	return []byte(t.String()), nil
+// MarshalJSONPB renders trace id as a single hex string.
+func (t TraceID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
+	var b strings.Builder
+	s := t.String()
+	b.Grow(2 + len(s))
+	b.WriteByte('"')
+	b.WriteString(s)
+	b.WriteByte('"')
+	return []byte(b.String()), nil
 }
 
-// UnmarshalText allows TraceID to deserialize itself from a JSON string.
-func (t *TraceID) UnmarshalText(text []byte) error {
-	q, err := TraceIDFromString(string(text))
+// UnmarshalJSONPB populates TraceID from a quoted hex string. Called by gogo/protobuf/jsonpb.
+func (t *TraceID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
+	if len(b) < 3 {
+		return fmt.Errorf("TraceID JSON string cannot be shorter than 3 chars: '%s'", string(b))
+	}
+	if b[0] != '"' || b[len(b)-1] != '"' {
+		return fmt.Errorf("TraceID JSON string must be enclosed in quotes: '%s'", string(b))
+	}
+	q, err := TraceIDFromString(string(b[1 : len(b)-1]))
 	if err != nil {
 		return err
 	}
@@ -196,8 +213,19 @@ func (t *TraceID) UnmarshalText(text []byte) error {
 	return nil
 }
 
+// MarshalText is called by encoding/json, which we do not want people to use.
+func (t TraceID) MarshalText() ([]byte, error) {
+	return nil, fmt.Errorf("unsupported method TraceID.MarshalText; please use github.com/gogo/protobuf/jsonpb for marshalling")
+}
+
+// UnmarshalText is called by encoding/json, which we do not want people to use.
+func (t *TraceID) UnmarshalText(text []byte) error {
+	return fmt.Errorf("unsupported method TraceID.UnmarshalText; please use github.com/gogo/protobuf/jsonpb for marshalling")
+}
+
 // ------- SpanID -------
 
+// String converts SpanID to a hex string.
 func (s SpanID) String() string {
 	return fmt.Sprintf("%x", uint64(s))
 }
@@ -214,17 +242,37 @@ func SpanIDFromString(s string) (SpanID, error) {
 	return SpanID(id), nil
 }
 
-// MarshalText allows SpanID to serialize itself in JSON as a string.
-func (s SpanID) MarshalText() ([]byte, error) {
-	return []byte(s.String()), nil
+// MarshalJSON renders span id as a single hex string. The value is returned enclosed in quotes.
+func (s SpanID) MarshalJSON() ([]byte, error) {
+	var b strings.Builder
+	str := s.String()
+	b.Grow(2 + len(str))
+	b.WriteByte('"')
+	b.WriteString(str)
+	b.WriteByte('"')
+	return []byte(b.String()), nil
 }
 
-// UnmarshalText allows SpanID to deserialize itself from a JSON string.
-func (s *SpanID) UnmarshalText(text []byte) error {
-	q, err := SpanIDFromString(string(text))
+// UnmarshalJSON populates SpanID from a quoted hex string. Called by gogo/protobuf/jsonpb.
+// There appears to be a bug in gogoproto, as this function is only called for numeric values.
+// https://github.com/gogo/protobuf/issues/411#issuecomment-393856837
+func (s *SpanID) UnmarshalJSON(b []byte) error {
+	q, err := SpanIDFromString(string(b))
 	if err != nil {
 		return err
 	}
 	*s = q
 	return nil
+}
+
+// UnmarshalJSONPB populates SpanID from a quoted hex string. Called by gogo/protobuf/jsonpb.
+// The input value is a quoted string.
+func (s *SpanID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
+	if len(b) < 3 {
+		return fmt.Errorf("SpanID JSON string cannot be shorter than 3 chars: %s", string(b))
+	}
+	if b[0] != '"' || b[len(b)-1] != '"' {
+		return fmt.Errorf("SpanID JSON string must be enclosed in quotes: %s", string(b))
+	}
+	return s.UnmarshalJSON(b[1 : len(b)-1])
 }

@@ -67,6 +67,17 @@
     }
   },
   "definitions": {
+    "TraceProcessMapping": {
+      "type": "object",
+      "properties": {
+        "processID": {
+          "type": "string"
+        },
+        "process": {
+          "$ref": "#/definitions/jaegerProcess"
+        }
+      }
+    },
     "jaegerBatch": {
       "type": "object",
       "properties": {
@@ -93,17 +104,17 @@
         "vStr": {
           "type": "string"
         },
-        "vDouble": {
-          "type": "number",
-          "format": "double"
-        },
         "vBool": {
           "type": "boolean",
           "format": "boolean"
         },
-        "vLong": {
+        "vInt64": {
           "type": "string",
-          "format": "uint64"
+          "format": "int64"
+        },
+        "vFloat64": {
+          "type": "number",
+          "format": "double"
         },
         "vBinary": {
           "type": "string",
@@ -147,7 +158,8 @@
           "$ref": "#/definitions/jaegerTraceID"
         },
         "spanID": {
-          "$ref": "#/definitions/jaegerSpanID"
+          "type": "string",
+          "format": "uint64"
         },
         "operation_name": {
           "type": "string"
@@ -195,15 +207,6 @@
         }
       }
     },
-    "jaegerSpanID": {
-      "type": "object",
-      "properties": {
-        "Value": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
     "jaegerSpanRef": {
       "type": "object",
       "properties": {
@@ -211,9 +214,10 @@
           "$ref": "#/definitions/jaegerTraceID"
         },
         "spanID": {
-          "$ref": "#/definitions/jaegerSpanID"
+          "type": "string",
+          "format": "uint64"
         },
-        "type": {
+        "refType": {
           "$ref": "#/definitions/jaegerSpanRefType"
         }
       }
@@ -236,9 +240,15 @@
           }
         },
         "processMap": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/jaegerProcess"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TraceProcessMapping"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }
@@ -260,9 +270,9 @@
       "type": "string",
       "enum": [
         "STRING",
-        "DOUBLE",
         "BOOL",
-        "LONG",
+        "INT64",
+        "FLOAT64",
         "BINARY"
       ],
       "default": "STRING"

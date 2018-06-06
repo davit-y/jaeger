@@ -92,6 +92,8 @@ cover: nocover
 	@echo pre-compiling tests
 	@time go test -i $(ALL_PKGS)
 	@./scripts/cover.sh $(shell go list $(TOP_PKGS))
+	grep -E -v 'jaeger.pb.*.go' cover.out > cover-nogen.out
+	mv cover-nogen.out cover.out
 	go tool cover -html=cover.out -o cover.html
 
 .PHONY: nocover
@@ -338,4 +340,4 @@ $$GOPATH/src/ \
 		model/proto/jaeger.proto
 
 	# Workaround for https://github.com/grpc-ecosystem/grpc-gateway/issues/229.
-	sed -i '' "s/empty.Empty/types.Empty/g" model/proto/jaeger.pb.gw.go
+	sed -i '' "s/empty.Empty/types.Empty/g" model/jaeger.pb.gw.go
