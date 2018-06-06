@@ -30,13 +30,13 @@
       "operationName": "get",
       "references": [
         {
-          "refType": "follows-from",
+          "refType": "FOLLOWS_FROM",
           "traceID": "52969a8955571a3f",
           "spanID": "68c4e3"
         }
       ],
       "startTime": "2017-01-26T16:46:31.639875-05:00",
-      "duration": 22938000,
+      "duration": "22938000ns",
       "process": {
         "serviceName": "api"
       }
