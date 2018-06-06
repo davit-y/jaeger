@@ -1,24 +1,24 @@
 {
   "spans": [
     {
-      "traceID": "12",
-      "spanID": "4",
+      "traceId": "12",
+      "spanId": "4",
       "operationName": "query12-operation",
       "references": [
         {
           "refType": "CHILD_OF",
-          "traceID": "ff",
-          "spanID": "ff"
+          "traceId": "ff",
+          "spanId": "ff"
         },
         {
           "refType": "CHILD_OF",
-          "traceID": "1",
-          "spanID": "2"
+          "traceId": "1",
+          "spanId": "2"
         },
         {
           "refType": "FOLLOWS_FROM",
-          "traceID": "1",
-          "spanID": "2"
+          "traceId": "1",
+          "spanId": "2"
         }
       ],
       "tags": [

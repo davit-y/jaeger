@@ -35,7 +35,7 @@ const NumberOfFixtures = 2
 func TestToDomain(t *testing.T) {
 	for i := 1; i <= NumberOfFixtures; i++ {
 		in := fmt.Sprintf("fixtures/thrift_batch_%02d.json", i)
-		out := fmt.Sprintf("fixtures/model_%02d.json", i)
+		out := fmt.Sprintf("fixtures/domain_%02d.json", i)
 		mSpans := loadSpans(t, out)
 		for _, s := range mSpans {
 			s.NormalizeTimestamps()

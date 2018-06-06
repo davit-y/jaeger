@@ -70,7 +70,7 @@
     "TraceProcessMapping": {
       "type": "object",
       "properties": {
-        "processID": {
+        "process_id": {
           "type": "string"
         },
         "process": {
@@ -98,25 +98,25 @@
         "key": {
           "type": "string"
         },
-        "vType": {
+        "v_type": {
           "$ref": "#/definitions/jaegerValueType"
         },
-        "vStr": {
+        "v_str": {
           "type": "string"
         },
-        "vBool": {
+        "v_bool": {
           "type": "boolean",
           "format": "boolean"
         },
-        "vInt64": {
+        "v_int64": {
           "type": "string",
           "format": "int64"
         },
-        "vFloat64": {
+        "v_float64": {
           "type": "number",
           "format": "double"
         },
-        "vBinary": {
+        "v_binary": {
           "type": "string",
           "format": "byte"
         }
@@ -154,10 +154,10 @@
     "jaegerSpan": {
       "type": "object",
       "properties": {
-        "traceID": {
+        "trace_id": {
           "$ref": "#/definitions/jaegerTraceID"
         },
-        "spanID": {
+        "span_id": {
           "type": "string",
           "format": "uint64"
         },
@@ -174,7 +174,7 @@
           "type": "integer",
           "format": "int64"
         },
-        "startTime": {
+        "start_time": {
           "type": "string",
           "format": "date-time"
         },
@@ -196,7 +196,7 @@
         "process": {
           "$ref": "#/definitions/jaegerProcess"
         },
-        "processID": {
+        "process_id": {
           "type": "string"
         },
         "warnings": {
@@ -210,14 +210,14 @@
     "jaegerSpanRef": {
       "type": "object",
       "properties": {
-        "traceID": {
+        "trace_id": {
           "$ref": "#/definitions/jaegerTraceID"
         },
-        "spanID": {
+        "span_id": {
           "type": "string",
           "format": "uint64"
         },
-        "refType": {
+        "ref_type": {
           "$ref": "#/definitions/jaegerSpanRefType"
         }
       }
@@ -239,7 +239,7 @@
             "$ref": "#/definitions/jaegerSpan"
           }
         },
-        "processMap": {
+        "process_map": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/TraceProcessMapping"

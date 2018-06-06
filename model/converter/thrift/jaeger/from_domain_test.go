@@ -41,7 +41,7 @@ func spanRefsEqual(refs []*j.SpanRef, otherRefs []*j.SpanRef) bool {
 }
 
 func TestFromDomainOneSpan(t *testing.T) {
-	spanFile := "fixtures/model_01.json"
+	spanFile := "fixtures/domain_01.json"
 	modelSpans := loadSpans(t, spanFile)
 
 	batchFile := "fixtures/thrift_batch_01.json"
@@ -57,7 +57,7 @@ func TestFromDomainOneSpan(t *testing.T) {
 }
 
 func TestFromDomain(t *testing.T) {
-	file := "fixtures/model_03.json"
+	file := "fixtures/domain_03.json"
 	modelSpans := loadSpans(t, file)
 
 	batchFile := "fixtures/thrift_batch_01.json"

@@ -42,7 +42,7 @@ const NumberOfFixtures = 3
 func TestToDomain(t *testing.T) {
 	for i := 1; i <= NumberOfFixtures; i++ {
 		in := fmt.Sprintf("fixtures/zipkin_%02d.json", i)
-		out := fmt.Sprintf("fixtures/jaeger_%02d.json", i)
+		out := fmt.Sprintf("fixtures/domain_%02d.json", i)
 		zSpans := loadZipkinSpans(t, in)
 		expectedTrace := loadJaegerTrace(t, out)
 		expectedTrace.NormalizeTimestamps()

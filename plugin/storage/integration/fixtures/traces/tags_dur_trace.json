@@ -1,8 +1,8 @@
 {
   "spans": [
     {
-      "traceID": "15",
-      "spanID": "4",
+      "traceId": "15",
+      "spanId": "4",
       "operationName": "placeholder",
       "references": [],
       "startTime": "2017-01-26T16:46:31.639875Z",

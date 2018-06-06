@@ -16,11 +16,11 @@ package model_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"testing"
 
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/jaegertracing/jaeger/model"
 )
@@ -56,14 +56,15 @@ func TestSpanRefTypeToFromJSON(t *testing.T) {
 	out := new(bytes.Buffer)
 	err := new(jsonpb.Marshaler).Marshal(out, &sr)
 	assert.NoError(t, err)
-	assert.Equal(t, `{"traceID":"42","spanID":"43","refType":"FOLLOWS_FROM"}`, out.String())
+	assert.Equal(t, `{"traceId":"42","spanId":"43","refType":"FOLLOWS_FROM"}`, out.String())
 	var sr2 model.SpanRef
 	if assert.NoError(t, jsonpb.Unmarshal(out, &sr2)) {
 		assert.Equal(t, sr, sr2)
 	}
 	var sr3 model.SpanRef
-	err = json.Unmarshal([]byte(`{"refType":"BAD"}`), &sr3)
-	assert.Error(t, err)
+	err = jsonpb.Unmarshal(bytes.NewReader([]byte(`{"refType":"BAD"}`)), &sr3)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "unknown value")
 }
 
 func TestMaybeAddParentSpanID(t *testing.T) {

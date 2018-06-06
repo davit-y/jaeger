@@ -19,12 +19,12 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "google/api/annotations.proto";
-import "protoc-gen-swagger/options/annotations.proto";
+import "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 // import "github.com/mwitkow/go-proto-validators/validator.proto";
 
 // Specifies path for generated file (relative to $GOPATH) and the name of the package.
-option go_package = "github.com/jaegertracing/jaeger/model;model";
+option go_package = "model";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
   info: {
@@ -82,12 +82,12 @@ message KeyValue {
   option (gogoproto.compare) = true;
 
   string    key      = 1;
-  ValueType vType    = 2;
-  string    vStr     = 3;
-  bool      vBool    = 4;
-  int64     vInt64   = 5;
-  double    vFloat64 = 6;
-  bytes     vBinary  = 7;
+  ValueType v_type    = 2;
+  string    v_str     = 3;
+  bool      v_bool    = 4;
+  int64     v_int64   = 5;
+  double    v_float64 = 6;
+  bytes     v_binary  = 7;
 }
 
 message Log {
@@ -106,14 +106,16 @@ enum SpanRefType {
 };
 
 message SpanRef {
-  TraceID traceID = 1 [
-    (gogoproto.nullable) = false
-  ];
-  uint64 spanID = 2 [
+  TraceID trace_id = 1 [
     (gogoproto.nullable) = false,
+    (gogoproto.customname) = "TraceID"
+  ];
+  uint64 span_id = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customname) = "SpanID",
     (gogoproto.customtype) = "SpanID" // alias to uint64
   ];
-  SpanRefType refType = 3;
+  SpanRefType ref_type = 3;
 }
 
 message Process {
@@ -124,11 +126,13 @@ message Process {
 }
 
 message Span {
-  TraceID traceID = 1 [
-    (gogoproto.nullable) = false
-  ];
-  uint64 spanID = 2 [
+  TraceID trace_id = 1 [
     (gogoproto.nullable) = false,
+    (gogoproto.customname) = "TraceID"
+  ];
+  uint64 span_id = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customname) = "SpanID",
     (gogoproto.customtype) = "SpanID"
   ];
   string operation_name = 3;
@@ -139,7 +143,7 @@ message Span {
     (gogoproto.nullable) = false,
     (gogoproto.customtype) = "Flags" // alias to uint32
   ];
-  google.protobuf.Timestamp startTime = 6 [
+  google.protobuf.Timestamp start_time = 6 [
     (gogoproto.stdtime) = true,
     (gogoproto.nullable) = false
   ];
@@ -154,29 +158,33 @@ message Span {
     (gogoproto.nullable) = false
   ];
   Process process = 10;
-  string processID = 11;
+  string process_id = 11 [
+    (gogoproto.customname) = "ProcessID"
+  ];
   repeated string warnings = 12;
 }
 
-message Span2 {
-    TraceID traceID = 1 [
-      (gogoproto.nullable) = false
-    ];
-    uint64 spanID = 2 [
-      (gogoproto.nullable) = false,
-      (gogoproto.customtype) = "SpanID"
-    ];
-}
+// message Span2 {
+//     TraceID traceID = 1 [
+//       (gogoproto.nullable) = false
+//     ];
+//     uint64 spanID = 2 [
+//       (gogoproto.nullable) = false,
+//       (gogoproto.customtype) = "SpanID"
+//     ];
+// }
 
 message Trace {
   message ProcessMapping {
-      string processID = 1;
+      string process_id = 1 [
+        (gogoproto.customname) = "ProcessID"
+      ];
       Process process = 2 [
         (gogoproto.nullable) = false
       ];
   }
   repeated Span spans = 1;
-  repeated ProcessMapping processMap = 2 [
+  repeated ProcessMapping process_map = 2 [
     (gogoproto.nullable) = false
   ];
   repeated string warnings = 3;

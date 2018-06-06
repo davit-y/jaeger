@@ -116,7 +116,7 @@ func TestSpanIDMarshalJSON(t *testing.T) {
 		{id: uint64(max), out: "ffffffffffffffff"},
 	}
 	for _, testCase := range testCases {
-		expected := fmt.Sprintf(`{"traceID":"0","spanID":"%s"}`, testCase.out)
+		expected := fmt.Sprintf(`{"traceId":"0","spanId":"%s"}`, testCase.out)
 		t.Run(expected, func(t *testing.T) {
 			ref := &model.SpanRef{SpanID: model.SpanID(testCase.id)}
 			out := new(bytes.Buffer)
@@ -144,7 +144,7 @@ func TestSpanIDUnmarshalJSON(t *testing.T) {
 		{err: true, in: "10123456789abcdef"},
 	}
 	for _, testCase := range testCases {
-		in := fmt.Sprintf(`{"traceID":"0","spanID":"%s"}`, testCase.in)
+		in := fmt.Sprintf(`{"traceId":"0","spanId":"%s"}`, testCase.in)
 		t.Run(in, func(t *testing.T) {
 			var ref model.SpanRef
 			err := jsonpb.Unmarshal(bytes.NewReader([]byte(in)), &ref)

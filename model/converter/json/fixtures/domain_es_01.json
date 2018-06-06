@@ -1,22 +1,22 @@
 {
-  "traceID": "1",
-  "spanID": "2",
+  "traceId": "1",
+  "spanId": "2",
   "operationName": "test-general-conversion",
   "references": [
     {
       "refType": "CHILD_OF",
-      "traceID": "1",
-      "spanID": "3"
+      "traceId": "1",
+      "spanId": "3"
     },
     {
       "refType": "FOLLOWS_FROM",
-      "traceID": "1",
-      "spanID": "4"
+      "traceId": "1",
+      "spanId": "4"
     },
     {
       "refType": "CHILD_OF",
-      "traceID": "ff",
-      "spanID": "ff"
+      "traceId": "ff",
+      "spanId": "ff"
     }
   ],
   "flags": 1,
